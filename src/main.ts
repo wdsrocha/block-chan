@@ -4,11 +4,11 @@ export class Block {
   index: number;
   previousHash: string | null = null;
   hash: string | null;
-  timestamp: Date;
+  timestamp: number;
   data: any;
   nonce: number = 0;
 
-  constructor(index: number, timestamp: Date, data: any) {
+  constructor(index: number, timestamp: number, data: any) {
     this.index = index;
     this.timestamp = timestamp;
     this.data = data;
@@ -41,12 +41,15 @@ export class Blockchain {
   chain: Array<Block>;
   difficulty = 2;
 
-  constructor() {
+  constructor(difficulty?: number) {
     this.chain = [this.createGenesisBlock()];
+    if (difficulty) {
+      this.difficulty = difficulty;
+    }
   }
 
   createGenesisBlock(): Block {
-    return new Block(0, new Date(), null);
+    return new Block(0, Date.now(), null);
   }
 
   getLastBlock() {
