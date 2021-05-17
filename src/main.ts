@@ -6,6 +6,7 @@ export class Block {
   hash: string | null;
   timestamp: Date;
   data: any;
+  nonce: number = 0;
 
   constructor(index: number, timestamp: Date, data: any) {
     this.index = index;
@@ -20,14 +21,25 @@ export class Block {
         this.index.toString() +
           (this.previousHash ?? "") +
           this.timestamp.toString() +
-          JSON.stringify(this.data)
+          JSON.stringify(this.data) +
+          this.nonce
       )
       .digest("hex");
+  }
+
+  mineBlock(difficulty: number) {
+    while (
+      this.hash?.substring(0, difficulty) !== Array(difficulty + 1).join("0")
+    ) {
+      this.nonce++;
+      this.hash = this.calculateHash();
+    }
   }
 }
 
 export class Blockchain {
   chain: Array<Block>;
+  difficulty = 2;
 
   constructor() {
     this.chain = [this.createGenesisBlock()];
@@ -43,7 +55,7 @@ export class Blockchain {
 
   addBlock(block: Block) {
     block.previousHash = this.getLastBlock().hash;
-    block.hash = block.calculateHash();
+    block.mineBlock(this.difficulty);
     this.chain.push(block);
   }
 
